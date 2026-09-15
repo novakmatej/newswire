@@ -1,0 +1,48 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "newswire"
+# Kept in sync with git tags manually - see docs/releasing.md.
+version = "1.0.0"
+description = "Config-driven source -> digest -> channel news notifier"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Matej Novak" }]
+dependencies = [
+    "requests>=2.32.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=5.0.0",
+]
+
+# PEP 735 dev group - installed by plain `uv sync`; pip users: `pip install --group dev .`
+[dependency-groups]
+dev = [
+    "pytest>=8.3.0",
+    "ruff>=0.5.0",
+]
+
+[project.scripts]
+newswire = "newswire.cli:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "-q"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/newswire"]

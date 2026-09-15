@@ -1,0 +1,10 @@
+# Example config - directory layout. Identical to config.example.yml.
+# File names are the top-level keys they contribute; config.yml may carry
+# anything that is not split out (here: defaults and digest).
+
+defaults:
+  timeout: 10
+
+digest:
+  title: "dbt News"
+  intro: "Hey dbt builders! 👋 Here's what's been happening:"

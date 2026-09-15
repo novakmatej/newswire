@@ -1,0 +1,118 @@
+# Example config - single-file layout. The same setup split across a
+# directory lives in config.example/ (both load identically).
+#
+# Rules:
+#   - The order of `sources` is the order of the digest.
+#   - ${ENV_VAR} is replaced from the environment; an unset variable on an
+#     enabled entry fails the run. Secrets never live in this file.
+#   - `enabled: false` entries are shipped so you can see what exists;
+#     their ${ENV_VAR} references are not resolved until you enable them.
+
+defaults:
+  timeout: 10          # request timeout (seconds) for every source/notifier/state call
+
+digest:
+  title: "dbt News"    # used in digest headers and email subjects
+  intro: "Hey dbt builders! 👋 Here's what's been happening:"
+
+state:
+  backend: github_gist # or: local_file (options: {path: state.json})
+  options:
+    gist_id: ${GIST_ID}
+    token: ${GIST_TOKEN}      # PAT with the gist scope
+    filename: dbt-news-state.json
+
+sources:
+  # --- release-notes page: compares the newest h2 section with stored bullets
+  - id: dbt-cloud-releases
+    type: dbt_cloud_release_notes
+    title: "dbt Cloud Release Notes"
+    emoji: "☁️"
+    options:
+      url: https://docs.getdbt.com/docs/dbt-versions/release-notes/cloud
+
+  # --- GitHub releases: REST API, everything newer than the stored tag
+  - id: dbt-core-releases
+    type: github_releases
+    title: "dbt-core"
+    emoji: "🚀"
+    options:
+      repo: dbt-labs/dbt-core
+      token: ${GITHUB_TOKEN}   # optional here (raises rate limits)
+      # per_page: 30
+
+  # --- GitHub discussions: GraphQL API, token REQUIRED
+  - id: dbt-fusion-discussions
+    type: github_discussions
+    title: "Fusion Discussions"
+    emoji: "💬"
+    options:
+      repo: dbt-labs/dbt-fusion
+      category: announcements
+      token: ${GITHUB_TOKEN}
+
+  # --- Docusaurus blog listing: everything newer than the stored post URL
+  - id: dbt-blog
+    type: docusaurus_blog
+    title: "Developer Blog Posts"
+    emoji: "📰"
+    options:
+      url: https://docs.getdbt.com/blog
+      # item_selector: article.margin-bottom--xl
+      # title_selector: h2.title_f1Hy a
+      # date_selector: time
+
+  # --- generic linked-headings list: posts not yet in the stored set
+  - id: dbt-blog-product-news
+    type: html_list
+    title: "Product News"
+    emoji: "📰"
+    options:
+      url: https://www.getdbt.com/blog/category/product-news
+      section_id: latest-posts  # only items in the grid after this HTML id
+      # item_selector: h3.heading-4
+
+  - id: dbt-blog-press
+    type: html_list
+    enabled: false              # shipped, but off - enable to follow press posts
+    title: "Press"
+    emoji: "📰"
+    options:
+      url: https://www.getdbt.com/blog/category/press
+      section_id: latest-posts
+
+  - id: dbt-webinars
+    type: html_list
+    title: "Upcoming Webinars"
+    emoji: "🎥"
+    options:
+      url: https://www.getdbt.com/resources/webinars/category/upcoming
+
+  # --- a non-dbt source routed to its own channel (see notify + notifiers)
+  - id: airflow-releases
+    type: github_releases
+    enabled: false
+    title: "Apache Airflow"
+    emoji: "🌬️"
+    notify: [slack-platform]    # only this channel; omitted = every enabled notifier
+    options:
+      repo: apache/airflow
+
+notifiers:
+  - id: slack                   # ids are what `notify:` refers to
+    type: slack
+    options:
+      webhook_url: ${SLACK_WEBHOOK_URL}
+
+  - id: slack-platform          # a second Slack channel for the airflow example
+    type: slack
+    enabled: false
+    options:
+      webhook_url: ${SLACK_WEBHOOK_PLATFORM}
+
+  - id: teams
+    type: teams
+    enabled: false
+    send_no_news: false         # stay quiet when there is nothing new
+    options:
+      webhook_url: ${TEAMS_WEBHOOK_URL}   # a Teams *Workflow* webhook (Power Automate)

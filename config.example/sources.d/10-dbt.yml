@@ -1,0 +1,58 @@
+# Fragments in sources.d/ concatenate into the `sources` list in
+# lexicographic file order - the 10-, 20- prefixes ARE the digest order.
+# Renaming a file reorders the digest.
+
+- id: dbt-cloud-releases
+  type: dbt_cloud_release_notes
+  title: "dbt Cloud Release Notes"
+  emoji: "☁️"
+  options:
+    url: https://docs.getdbt.com/docs/dbt-versions/release-notes/cloud
+
+- id: dbt-core-releases
+  type: github_releases
+  title: "dbt-core"
+  emoji: "🚀"
+  options:
+    repo: dbt-labs/dbt-core
+    token: ${GITHUB_TOKEN}
+
+- id: dbt-fusion-discussions
+  type: github_discussions
+  title: "Fusion Discussions"
+  emoji: "💬"
+  options:
+    repo: dbt-labs/dbt-fusion
+    category: announcements
+    token: ${GITHUB_TOKEN}
+
+- id: dbt-blog
+  type: docusaurus_blog
+  title: "Developer Blog Posts"
+  emoji: "📰"
+  options:
+    url: https://docs.getdbt.com/blog
+
+- id: dbt-blog-product-news
+  type: html_list
+  title: "Product News"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/product-news
+    section_id: latest-posts
+
+- id: dbt-blog-press
+  type: html_list
+  enabled: false
+  title: "Press"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/press
+    section_id: latest-posts
+
+- id: dbt-webinars
+  type: html_list
+  title: "Upcoming Webinars"
+  emoji: "🎥"
+  options:
+    url: https://www.getdbt.com/resources/webinars/category/upcoming

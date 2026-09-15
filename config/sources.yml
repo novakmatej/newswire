@@ -1,0 +1,144 @@
+# Sources - list order is the digest order. Flip enabled: to switch one off.
+# notify: lists the channels a source posts to. Omit it to post to every
+# enabled notifier (new channels then join automatically); an explicit list
+# pins exactly those ids.
+# Source ids are state keys:
+# do not rename them (they match the pre-rewrite gist keys).
+
+- id: dbt-cloud-releases
+  type: dbt_cloud_release_notes
+  enabled: true
+  notify: [slack, teams]
+  title: "dbt Cloud Release Notes"
+  emoji: "☁️"
+  options:
+    url: https://docs.getdbt.com/docs/dbt-versions/release-notes/cloud
+
+- id: dbt-core-releases
+  type: github_releases
+  enabled: true
+  notify: [slack, teams]
+  title: "dbt-core"
+  emoji: "🚀"
+  options:
+    repo: dbt-labs/dbt-core
+    token: ${GITHUB_TOKEN}
+
+- id: dbt-fusion-discussions
+  type: github_discussions
+  enabled: true
+  notify: [slack, teams]
+  title: "Fusion Discussions"
+  emoji: "💬"
+  options:
+    repo: dbt-labs/dbt-fusion
+    category: announcements
+    token: ${GITHUB_TOKEN}
+
+- id: dbt-blog
+  type: docusaurus_blog
+  enabled: true
+  notify: [slack, teams]
+  title: "Developer Blog Posts"
+  emoji: "📰"
+  options:
+    url: https://docs.getdbt.com/blog
+
+- id: dbt-blog-company-news
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Company News"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/company-news
+    section_id: latest-posts
+
+- id: dbt-blog-product-news
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Product News"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/product-news
+    section_id: latest-posts
+
+- id: dbt-blog-insights
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Insights"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/insights
+    section_id: latest-posts
+
+- id: dbt-blog-learn
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Learn"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/learn
+    section_id: latest-posts
+
+- id: dbt-blog-community-news
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Community News"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/community-news
+    section_id: latest-posts
+
+- id: dbt-blog-partnerships
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Partnerships"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/partnerships
+    section_id: latest-posts
+
+- id: dbt-blog-press
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Press"
+  emoji: "📰"
+  options:
+    url: https://www.getdbt.com/blog/category/press
+    section_id: latest-posts
+
+- id: dbt-webinars
+  type: html_list
+  enabled: true
+  notify: [slack, teams]
+  title: "Upcoming Webinars"
+  emoji: "🎥"
+  options:
+    url: https://www.getdbt.com/resources/webinars/category/upcoming
+
+- id: terraform-provider-releases
+  type: github_releases
+  enabled: true
+  notify: [slack, teams]
+  title: "terraform-provider-dbtcloud"
+  emoji: "🚀"
+  options:
+    repo: dbt-labs/terraform-provider-dbtcloud
+    token: ${GITHUB_TOKEN}
+
+- id: dbt-charts-releases
+  type: github_releases
+  enabled: true
+  notify: [slack, teams]
+  title: "dbt-charts"
+  emoji: "🚀"
+  options:
+    repo: dbt-labs/dbt-charts
+    token: ${GITHUB_TOKEN}
