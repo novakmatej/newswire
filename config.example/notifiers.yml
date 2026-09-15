@@ -1,0 +1,19 @@
+# Contributes the `notifiers` list.
+
+- id: slack
+  type: slack
+  options:
+    webhook_url: ${SLACK_WEBHOOK_URL}
+
+- id: slack-platform
+  type: slack
+  enabled: false
+  options:
+    webhook_url: ${SLACK_WEBHOOK_PLATFORM}
+
+- id: teams
+  type: teams
+  enabled: false
+  send_no_news: false
+  options:
+    webhook_url: ${TEAMS_WEBHOOK_URL}

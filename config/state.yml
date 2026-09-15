@@ -1,0 +1,8 @@
+# State backend. The filename matches the pre-rewrite gist file so the
+# existing deployment's history carries over untouched.
+
+backend: github_gist
+options:
+  gist_id: ${GIST_ID}
+  token: ${GIST_TOKEN}
+  filename: dbt-news-state.json

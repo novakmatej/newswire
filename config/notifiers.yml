@@ -1,0 +1,13 @@
+# Channels. Slack and Teams only.
+
+- id: slack
+  type: slack
+  enabled: true
+  options:
+    webhook_url: ${SLACK_WEBHOOK_URL}
+
+- id: teams
+  type: teams
+  enabled: true
+  options:
+    webhook_url: ${TEAMS_WEBHOOK_URL}

@@ -1,0 +1,11 @@
+# Live config for this repo's deployment (GitHub Actions, Mondays 07:00 UTC),
+# split by concern: this file carries defaults + digest, state.yml the state
+# backend, notifiers.yml the channels, sources.yml the sources (= digest order).
+# Secrets come from ${ENV_VAR} interpolation - never write them in these files.
+
+defaults:
+  timeout: 10
+
+digest:
+  title: "dbt News"
+  intro: "Hey dbt builders! 👋 Here's what's been happening:"

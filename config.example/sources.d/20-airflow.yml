@@ -1,0 +1,10 @@
+# A second topic in its own fragment, routed to its own channel.
+
+- id: airflow-releases
+  type: github_releases
+  enabled: false
+  title: "Apache Airflow"
+  emoji: "🌬️"
+  notify: [slack-platform]
+  options:
+    repo: apache/airflow

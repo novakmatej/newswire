@@ -1,0 +1,8 @@
+# Contributes the `state` block. Written bare (preferred); wrapping it under
+# a top-level `state:` key is also accepted.
+
+backend: github_gist
+options:
+  gist_id: ${GIST_ID}
+  token: ${GIST_TOKEN}
+  filename: dbt-news-state.json
