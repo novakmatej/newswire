@@ -43,6 +43,12 @@ github:
       title: Bug Fixes
       semver-field: patch
       labels: [bug, fix, bug-fix, patch]
+    # Not a chronicle default. Title inference only covers feat:/fix:/perf:/"!",
+    # so docs: and chore: PRs need one of these labels to appear at all.
+    - name: documentation
+      title: Documentation
+      semver-field: patch
+      labels: [documentation, docs, chore, maintenance]
     - name: security-fixes
       title: Security Fixes
       semver-field: patch
