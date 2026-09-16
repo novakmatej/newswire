@@ -11,12 +11,16 @@ Chronicle reads, in order of precedence:
 1. **A label on the PR** — see the mapping in [`.chronicle.yaml`](../.chronicle.yaml):
    `enhancement`/`feature` → Added Features (minor bump), `bug`/`fix` → Bug Fixes (patch),
    `breaking-change`/`major` → Breaking Changes (major), `security` → Security Fixes,
-   `deprecated` → Deprecated, `removed` → Removed.
+   `deprecated` → Deprecated, `removed` → Removed, `documentation`/`docs`/`chore` →
+   Documentation (patch).
 2. **The PR title's conventional-commit prefix** as fallback: `feat:` → minor, `fix:`/`perf:` →
    patch, a `!` (e.g. `feat!:`) → major.
 
 A PR with neither a label nor a recognised prefix **silently produces no changelog entry**. Label
-it or fix the title before merging.
+it or fix the title before merging. Title inference covers only the four prefixes above, so a
+`docs:` or `chore:` PR needs the `documentation` label — this is the one case that bites, because
+both prefixes are otherwise standard in this repo. Labels can be added after the merge too;
+chronicle reads them when the notes are generated, not when the PR lands.
 
 ## 2. Preview the changelog locally
 
