@@ -9,6 +9,33 @@ ecosystem, but nothing dbt-specific lives in the code — point it at Airflow or
 
 Current version: **1.0.0** — stable, used in production for the dbt digest in this repo.
 
+## Contents
+
+- [What you get](#what-you-get)
+- [Quickstart](#quickstart)
+- [How it works](#how-it-works)
+- [Documentation](#documentation)
+- [Development](#development)
+- [License](#license)
+
+## What you get
+
+An automatically received newsletter about (not only) dbt news — delivered to the channels your
+team already reads, no inbox and no subscription.
+
+One scheduled run, one digest per channel — the shipped dbt config posting to Slack and Teams:
+
+### Slack
+
+![Slack digest: a dbt News post with a dbt Cloud Release Notes section of bulleted changes](docs/preview/slack-preview.png)
+
+### Microsoft Teams
+
+![Teams Adaptive Card: a dbt News Update with the same release-notes section](docs/preview/teams-preview.png)
+
+Sections, their order and their emoji come from the `sources` list in your config; each channel
+renders them natively (Block Kit vs Adaptive Card).
+
 ## Quickstart
 
 Try it in two minutes: one source, one Slack channel, state in a local JSON file — no GitHub
