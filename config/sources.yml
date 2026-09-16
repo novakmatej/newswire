@@ -24,9 +24,12 @@
     repo: dbt-labs/dbt-core
     token: ${GITHUB_TOKEN}
 
+# Disabled 2026-09-15: dbt-labs turned Discussions off on dbt-labs/dbt-fusion
+# (`has_discussions: false`), so this source can only fail. Re-enable, or point
+# `repo`/`category` at wherever Fusion announcements land, once that is known.
 - id: dbt-fusion-discussions
   type: github_discussions
-  enabled: true
+  enabled: false
   notify: [slack, teams]
   title: "Fusion Discussions"
   emoji: "💬"
