@@ -54,7 +54,7 @@ Then re-tag the right commit and push again.
 ## Versioning policy
 
 - Semantic versioning, tags `vMAJOR.MINOR.PATCH`.
-- `v0.0.1` is the pre-rewrite snapshot (pre-release); `v1.0.0` is the first supported release.
+- `v1.0.0` is the first release.
 - `enforce-v0: false` in `.chronicle.yaml`: breaking changes bump major.
 - No PyPI publishing; install from the repo (pip/uv/Docker).
 

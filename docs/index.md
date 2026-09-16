@@ -36,4 +36,3 @@ One line per page. Start with the README quickstart, then come back here.
 
 - [releasing.md](releasing.md) — labels → chronicle → tag → GitHub Release
 - [troubleshooting.md](troubleshooting.md) — symptom → cause → fix
-- [migrating-from-0.0.1.md](migrating-from-0.0.1.md) — for pre-rewrite deployments

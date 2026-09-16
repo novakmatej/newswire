@@ -77,8 +77,7 @@ sources (fetch + diff against state) ──> per-notifier digest ──> channel
 
 Everything lives in [docs/](docs/index.md). Most-visited pages:
 [configuration](docs/configuration.md) · [env vars](docs/reference/env-vars.md) ·
-[troubleshooting](docs/troubleshooting.md) · [add a source](docs/add-a-source.md) ·
-[migrating from v0.0.1](docs/migrating-from-0.0.1.md)
+[troubleshooting](docs/troubleshooting.md) · [add a source](docs/add-a-source.md)
 
 ## Development
 

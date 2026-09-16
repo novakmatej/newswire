@@ -1,5 +1,4 @@
-# State backend. The filename matches the pre-rewrite gist file so the
-# existing deployment's history carries over untouched.
+# State backend. Keep the filename stable - it is where the history lives.
 
 backend: github_gist
 options:
