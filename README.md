@@ -66,14 +66,19 @@ Gist, no tokens.
        options:
          webhook_url: ${SLACK_WEBHOOK_URL}
    ```
-3. Put your [Slack webhook](docs/guides/slack.md) into `.env`:
+3. Fill `SLACK_WEBHOOK_URL` in `.env`. **For a dry run any placeholder does** — nothing is sent,
+   but the variable has to exist, or the config fails to load:
    ```bash
-   echo 'SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...' > .env
+   echo 'SLACK_WEBHOOK_URL=https://example.invalid/dry-run' > .env
    ```
-4. Dry run — fetches and renders, sends nothing, writes no state:
+   Ready for a real channel? [Create a Slack webhook](docs/guides/slack.md) and paste it here
+   instead.
+4. Dry run — fetches and renders, sends nothing, writes no state. Redirect it to a file to read
+   the digest without any channel at all:
    ```bash
-   uv run newswire --dry-run
+   uv run newswire --dry-run > digest.txt
    ```
+   `digest.txt` holds what each notifier would have posted, section by section.
 5. Real run — posts the newest dbt-core release and remembers it in `state.json`:
    ```bash
    uv run newswire
