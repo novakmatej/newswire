@@ -20,7 +20,6 @@ repository. (`AGENTS.md` points here for other agent tools.)
 | Releases + changelog labels | `docs/releasing.md` | `.chronicle.yaml`, `.github/workflows/release.yml` |
 | Live deployment config | — | `config/` (ids = state keys, do not rename) |
 | Symptom → fix | `docs/troubleshooting.md` | — |
-| Migration from the pre-rewrite version | `docs/migrating-from-0.0.1.md` | — |
 
 Tests mirror the layout: `tests/test_source_*.py`, `tests/test_notifier_*.py`,
 `tests/test_config.py`, `tests/test_core.py` (routing/state contract), `tests/test_examples.py`
@@ -76,8 +75,7 @@ One pass, four stages: `config.py` loads and validates YAML → `core.run()` orc
   (dbt_cloud_release_notes). `read_cursor`/`read_seen` also accept the pre-1.0 field names (`last_id`,
   `last_url`, `urls`, `last_urls`, `numbers`) so an old Gist migrates in place — keep that.
 - **`state/*`** — one JSON document keyed by **source id**. Renaming a source id resets its
-  history; the ids in the repo's `config/sources.yml` deliberately equal the pre-rewrite state
-  keys. (The `type:` of a source is not part of state — renaming a type is safe.)
+  history. (The `type:` of a source is not part of state — renaming a type is safe.)
 - **`core.run()`** — routing (`notify:`, omitted = all enabled notifiers) and the delivery
   contract: a source's state entry advances only when every routed notifier accepted the digest
   (at-least-once delivery; this replaced the old fire-and-forget defect). Source failures are

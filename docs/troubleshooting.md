@@ -11,7 +11,6 @@ Symptom → cause → fix.
 | `unexpected file in config directory` | A file that matches no config name (e.g. `sources.yaml.bak`) | Remove it, or rename it to a `<key>.yml` / `<key>.d/*.yml` name |
 | `source '...' routes to unknown notifier id` | `notify:` names an id no notifier has | Fix the id; check `notifiers:` entries |
 | Everything re-sent on every run | State never persists: wrong Gist id/token, or `local_file` on a throwaway disk (Actions) | Verify the state backend; use `github_gist` on Actions |
-| Whole history re-sent once after migrating | The gist `filename` in config does not match the existing gist file | Set `state.options.filename` to the existing file name (`dbt-news-state.json`) |
 | One source re-notifies from scratch | Its `id` was renamed — the id is the state key | Restore the old id, or accept the one-time replay |
 | `source 'x' failed: Failed to scrape ...` | Page markup changed (scrapers are coupled to it) | Adjust the selector options; see [reference/sources.md](reference/sources.md) |
 | Discussions: `GraphQL errors` / token error | `github_discussions` has no token, or the Actions built-in token is used | Use a PAT — see [reference/env-vars.md](reference/env-vars.md) |

@@ -3,7 +3,7 @@
 # enabled notifier (new channels then join automatically); an explicit list
 # pins exactly those ids.
 # Source ids are state keys:
-# do not rename them (they match the pre-rewrite gist keys).
+# do not rename them, or the renamed source re-notifies from scratch.
 
 - id: dbt-cloud-releases
   type: dbt_cloud_release_notes
