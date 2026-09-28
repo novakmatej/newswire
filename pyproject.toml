@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "newswire"
 # Kept in sync with git tags manually - see docs/releasing.md.
-version = "1.0.0"
+version = "1.0.1"
 description = "Config-driven source -> digest -> channel news notifier"
 readme = "README.md"
 requires-python = ">=3.11"
