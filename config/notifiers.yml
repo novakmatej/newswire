@@ -2,7 +2,7 @@
 
 - id: slack
   type: slack
-  enabled: true
+  enabled: false
   options:
     webhook_url: ${SLACK_WEBHOOK_URL}
 
