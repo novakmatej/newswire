@@ -24,6 +24,17 @@
     repo: dbt-labs/dbt-core
     token: ${GITHUB_TOKEN}
 
+# dbt-labs/dbt is the dbt 2.x repo (separate from dbt-core 1.x).
+- id: dbt-releases
+  type: github_releases
+  enabled: true
+  notify: [slack, teams]
+  title: "dbt"
+  emoji: "🚀"
+  options:
+    repo: dbt-labs/dbt
+    token: ${GITHUB_TOKEN}
+
 # Disabled 2026-09-15: dbt-labs turned Discussions off on dbt-labs/dbt-fusion
 # (`has_discussions: false`), so this source can only fail. Re-enable, or point
 # `repo`/`category` at wherever Fusion announcements land, once that is known.
