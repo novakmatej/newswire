@@ -9,14 +9,17 @@ Adaptive Card TextBlocks render a markdown subset: **bold**, _italic_,
 section titles are bold text. Cards are chunked under ~28 KB; an oversized
 section is split by line.
 
-Options: ``webhook_url`` (required), ``timeout``.
+With ``collapsible: true`` every section renders as a clickable title that
+expands its body (``Action.ToggleVisibility``); the intro stays visible.
+
+Options: ``webhook_url`` (required), ``collapsible`` (false), ``timeout``.
 """
 
 from __future__ import annotations
 
 import json
 from datetime import datetime
-from typing import Any, Sequence
+from typing import Any, Callable, Sequence, Union
 
 import requests
 
@@ -33,6 +36,9 @@ from newswire.registry import notifier_type
 
 # Teams rejects adaptive card payloads at roughly 28 KB; stay clear of the edge.
 _MAX_CARD_BYTES = 25_000
+
+# A card block is either plain markdown or a collapsible (title, body) pair.
+Block = Union[str, tuple[str, str]]
 
 
 class TeamsNotificationError(NotificationError):
@@ -116,12 +122,14 @@ class TeamsNotifier:
         if not self.webhook_url:
             raise ConfigError(f"notifier '{cfg.id}': teams requires option 'webhook_url'")
         self.timeout = float(cfg.options.get("timeout", 10))
+        self.collapsible = cfg.options.get("collapsible", False)
+        if not isinstance(self.collapsible, bool):
+            raise ConfigError(f"notifier '{cfg.id}': option 'collapsible' must be true or false")
 
     def send_digest(self, sections: Sequence[Section]) -> None:
-        rendered: list[str] = []
+        rendered: list[Block] = []
         for section in sections:
-            rendered.extend(render_section(section))
-        rendered = [text for text in rendered if text]
+            rendered.extend(self._blocks(section))
         if not rendered:
             return
 
@@ -133,7 +141,7 @@ class TeamsNotifier:
         self._send_sections([intro, *rendered])
 
     def send_section(self, section: Section) -> None:
-        self._send_sections(render_section(section))
+        self._send_sections(self._blocks(section))
 
     def send_no_news(self) -> None:
         self._send_sections(
@@ -143,7 +151,13 @@ class TeamsNotifier:
             ]
         )
 
-    def _send_sections(self, sections: Sequence[str]) -> None:
+    def _blocks(self, section: Section) -> list[Block]:
+        rendered = [text for text in render_section(section) if text]
+        if not self.collapsible:
+            return list(rendered)
+        return [_collapse(text) for text in rendered]
+
+    def _send_sections(self, sections: Sequence[Block]) -> None:
         """Post sections as one or more Adaptive Cards."""
         for chunk in _chunk_sections([s for s in sections if s]):
             self._post(build_adaptive_card(chunk))
@@ -156,12 +170,43 @@ class TeamsNotifier:
             raise TeamsNotificationError(f"Failed to post Teams notification: {exc}") from exc
 
 
-def build_adaptive_card(sections: Sequence[str]) -> dict[str, Any]:
-    """Wrap markdown sections in the Teams Workflow Adaptive Card envelope."""
-    body = [
-        {"type": "TextBlock", "text": section, "wrap": True, "separator": index > 0}
-        for index, section in enumerate(sections)
-    ]
+def _collapse(text: str) -> Block:
+    """Split rendered markdown into (title, body) at its first paragraph break."""
+    title, _, body = text.partition("\n\n")
+    return (title, body) if body else text
+
+
+def build_adaptive_card(sections: Sequence[Block]) -> dict[str, Any]:
+    """Wrap markdown sections in the Teams Workflow Adaptive Card envelope.
+
+    A (title, body) block becomes a clickable title container that toggles a
+    hidden body container; the toggle target id only has to be unique per card.
+    """
+    body: list[dict[str, Any]] = []
+    for index, section in enumerate(sections):
+        if isinstance(section, str):
+            body.append(
+                {"type": "TextBlock", "text": section, "wrap": True, "separator": index > 0}
+            )
+            continue
+        title, text = section
+        target = f"section-{index}"
+        body.append(
+            {
+                "type": "Container",
+                "separator": index > 0,
+                "selectAction": {"type": "Action.ToggleVisibility", "targetElements": [target]},
+                "items": [{"type": "TextBlock", "text": f"{title} ▸", "wrap": True}],
+            }
+        )
+        body.append(
+            {
+                "type": "Container",
+                "id": target,
+                "isVisible": False,
+                "items": [{"type": "TextBlock", "text": text, "wrap": True}],
+            }
+        )
     return {
         "type": "message",
         "attachments": [
@@ -178,7 +223,9 @@ def build_adaptive_card(sections: Sequence[str]) -> dict[str, Any]:
     }
 
 
-def _chunk_sections(sections: Sequence[str], max_bytes: int = _MAX_CARD_BYTES) -> list[list[str]]:
+def _chunk_sections(
+    sections: Sequence[Block], max_bytes: int = _MAX_CARD_BYTES
+) -> list[list[Block]]:
     """Split sections into cards that each stay under the Teams payload limit.
 
     Sections too large on their own (a long blog list, say) are split by line so
@@ -187,8 +234,8 @@ def _chunk_sections(sections: Sequence[str], max_bytes: int = _MAX_CARD_BYTES) -
     ponytail: re-serializes per candidate (O(n^2)); n is sections/lines of one
     digest, so switch to running byte counts only if that grows to thousands.
     """
-    chunks: list[list[str]] = []
-    current: list[str] = []
+    chunks: list[list[Block]] = []
+    current: list[Block] = []
 
     for section in sections:
         for part in _split_oversized(section, max_bytes):
@@ -204,17 +251,30 @@ def _chunk_sections(sections: Sequence[str], max_bytes: int = _MAX_CARD_BYTES) -
     return chunks
 
 
-def _split_oversized(section: str, max_bytes: int) -> list[str]:
-    """Split one section into line-aligned parts that each fit in a card."""
+def _split_oversized(section: Block, max_bytes: int) -> list[Block]:
+    """Split one section into line-aligned parts that each fit in a card.
+
+    A collapsible section keeps its title on every part, marked "(cont.)".
+    """
     if _card_size([section]) <= max_bytes:
         return [section]
 
+    if isinstance(section, str):
+        return list(_split_lines(section, lambda text: _card_size([text]) <= max_bytes))
+
+    title, body = section
+    cont = f"{title} (cont.)"
+    parts = _split_lines(body, lambda text: _card_size([(cont, text)]) <= max_bytes)
+    return [(title if index == 0 else cont, part) for index, part in enumerate(parts)]
+
+
+def _split_lines(text: str, fits: Callable[[str], bool]) -> list[str]:
     parts: list[str] = []
     current: list[str] = []
 
-    for line in section.split("\n"):
+    for line in text.split("\n"):
         candidate = [*current, line]
-        if current and _card_size(["\n".join(candidate)]) > max_bytes:
+        if current and not fits("\n".join(candidate)):
             parts.append("\n".join(current))
             current = [line]
         else:
@@ -226,5 +286,5 @@ def _split_oversized(section: str, max_bytes: int) -> list[str]:
     return parts
 
 
-def _card_size(sections: Sequence[str]) -> int:
+def _card_size(sections: Sequence[Block]) -> int:
     return len(json.dumps(build_adaptive_card(sections)).encode("utf-8"))

@@ -27,5 +27,8 @@ Newswire posts Adaptive Cards to a Teams **Workflow** (Power Automate) webhook. 
 - Teams rejects card payloads around 28 KB. Newswire chunks a digest into multiple cards under
   ~25 KB and splits an oversized section by line; several cards for one big digest is expected.
 - The digest opens with an intro card (`digest.title` + `digest.intro`).
+- `collapsible: true` keeps a long digest short in the channel: each section shows only its title
+  (`▸`), a click expands the full content (`Action.ToggleVisibility`). Nothing is dropped. An
+  oversized section split across cards repeats its title with "(cont.)".
 
 Next: [slack.md](slack.md), [../routing.md](../routing.md)
