@@ -8,6 +8,7 @@ from unittest.mock import patch
 import pytest
 import requests
 
+from newswire.config import ConfigError
 from newswire.models import CARDS, LINKS, NOTES, Item, Section
 from newswire.notifiers.teams import (
     TeamsNotificationError,
@@ -39,9 +40,11 @@ def _card_content(payload: dict) -> dict:
     return payload["attachments"][0]["content"]
 
 
-def _notifier(notifier_cfg, digest_cfg) -> TeamsNotifier:
+def _notifier(notifier_cfg, digest_cfg, **options) -> TeamsNotifier:
     return TeamsNotifier(
-        notifier_cfg("teams", "teams", options={"webhook_url": "https://example.com/webhook"}),
+        notifier_cfg(
+            "teams", "teams", options={"webhook_url": "https://example.com/webhook", **options}
+        ),
         digest_cfg,
     )
 
@@ -162,3 +165,69 @@ def test_request_failure_raises_teams_error(notifier_cfg, digest_cfg) -> None:
     ):
         with pytest.raises(TeamsNotificationError, match="Failed to post Teams notification"):
             notifier.send_section(RELEASE_SECTION)
+
+
+def test_build_adaptive_card_collapsible_block_toggles_hidden_body() -> None:
+    body = _card_content(build_adaptive_card(["intro", ("**Title**", "- a\n- b")]))["body"]
+
+    assert body[0]["text"] == "intro"
+    header, content = body[1], body[2]
+    assert header["separator"] is True
+    assert header["items"][0]["text"] == "**Title** ▸"
+    assert header["selectAction"] == {
+        "type": "Action.ToggleVisibility",
+        "targetElements": [content["id"]],
+    }
+    assert content["isVisible"] is False
+    assert content["items"][0]["text"] == "- a\n- b"
+
+
+def test_send_digest_collapsible_keeps_intro_visible_and_full_content(
+    notifier_cfg, digest_cfg
+) -> None:
+    notifier = _notifier(notifier_cfg, digest_cfg, collapsible=True)
+
+    with patch("newswire.notifiers.teams.requests.post") as mock_post:
+        mock_post.return_value.raise_for_status.return_value = None
+        notifier.send_digest([RELEASE_SECTION])
+
+    body = _card_content(mock_post.call_args.kwargs["json"])["body"]
+    assert body[0]["type"] == "TextBlock"
+    assert "dbt News Update" in body[0]["text"]
+    assert "dbt-core v1.8.0" in body[1]["items"][0]["text"]
+    hidden = body[2]["items"][0]["text"]
+    assert "- Feature A" in hidden
+    assert "[View full release notes on GitHub](" in hidden
+
+
+def test_send_digest_collapsible_splits_oversized_section_with_titles(
+    notifier_cfg, digest_cfg
+) -> None:
+    big_section = Section(
+        source_id="blog",
+        title="Blog",
+        kind=LINKS,
+        items=tuple(
+            Item(title=f"Post {i} " + "x" * 400, url=f"https://example.com/{i}") for i in range(60)
+        ),
+    )
+    notifier = _notifier(notifier_cfg, digest_cfg, collapsible=True)
+
+    with patch("newswire.notifiers.teams.requests.post") as mock_post:
+        mock_post.return_value.raise_for_status.return_value = None
+        notifier.send_digest([big_section])
+
+    assert mock_post.call_count > 1
+    titles = []
+    for call in mock_post.call_args_list:
+        assert len(json.dumps(call.kwargs["json"]).encode("utf-8")) <= 25_000
+        for element in _card_content(call.kwargs["json"])["body"]:
+            if "selectAction" in element:
+                titles.append(element["items"][0]["text"])
+    assert titles[0] == "**Blog** ▸"
+    assert all(title == "**Blog** (cont.) ▸" for title in titles[1:])
+
+
+def test_collapsible_must_be_bool(notifier_cfg, digest_cfg) -> None:
+    with pytest.raises(ConfigError, match="collapsible"):
+        _notifier(notifier_cfg, digest_cfg, collapsible="yes")

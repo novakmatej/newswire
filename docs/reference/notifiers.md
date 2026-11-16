@@ -37,6 +37,7 @@ no tables). Payloads are chunked under ~25 KB; an oversized section is split by 
 | Option | Type | Required | Default | Description |
 | --- | --- | --- | --- | --- |
 | `webhook_url` | string | yes | — | Teams Workflow webhook (see [guides/teams.md](../guides/teams.md)) |
+| `collapsible` | bool | no | `false` | Render each section as a clickable title that expands its content; the intro stays visible |
 | `timeout` | number | no | `defaults.timeout` | Request timeout in seconds |
 
 ```yaml

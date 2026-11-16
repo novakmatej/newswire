@@ -11,3 +11,4 @@
   enabled: true
   options:
     webhook_url: ${TEAMS_WEBHOOK_URL}
+    collapsible: true   # sections show as clickable titles; full content on click
