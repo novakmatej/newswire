@@ -1,13 +1,14 @@
 # newswire
 
-![version](https://img.shields.io/badge/version-1.0.0-blue) ![license](https://img.shields.io/badge/license-MIT-green)
+[![release](https://img.shields.io/github/v/release/novakmatej/newswire)](https://github.com/novakmatej/newswire/releases) ![license](https://img.shields.io/badge/license-MIT-green)
 
 A config-driven news notifier: point it at sources (GitHub releases, discussions, blogs,
 release-notes pages), it checks what is new and posts a digest to your channels (Slack,
 Microsoft Teams). One YAML config decides everything; the shipped example follows the dbt
 ecosystem, but nothing dbt-specific lives in the code — point it at Airflow or Kubernetes instead.
 
-Current version: **1.0.0** — stable, used in production for the dbt digest in this repo.
+Current version: **1.2.0** — stable, used in production for the dbt digest in this repo.
+Changelog: [GitHub Releases](https://github.com/novakmatej/newswire/releases).
 
 ## Contents
 
@@ -100,7 +101,8 @@ sources (fetch + diff against state) ──> per-notifier digest ──> channel
 
 - **Sources**: `github_releases`, `github_discussions`, `docusaurus_blog`, `html_list`,
   `dbt_cloud_release_notes` — [reference](docs/reference/sources.md)
-- **Notifiers**: `slack`, `teams` — [reference](docs/reference/notifiers.md)
+- **Notifiers**: `slack`, `teams` (optional `collapsible` sections for long digests) —
+  [reference](docs/reference/notifiers.md)
 - **State**: `github_gist` or `local_file` — [reference](docs/reference/state.md)
 - **Routing**: each source picks its channels with `notify:` — [routing](docs/routing.md)
 - Digest section order = the order of the `sources` list. No hardcoded ordering.
